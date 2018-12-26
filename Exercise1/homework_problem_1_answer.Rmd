@@ -1,0 +1,61 @@
+---
+title: "AR_ProblemH1_Answer"
+output: html_document
+---
+
+
+#Read the LAozone.csv data in a variable LAozone
+```{r}
+library(readr)
+LAozone <- read_csv("~/Desktop/TUM Course/Applied Regression/Practical/Data sets-20171021/LAozone.csv",col_names=TRUE)
+```
+
+#Answer H.1.a
+```{r}
+summary(LAozone[2:10])
+```
+
+#Answer H.1.b
+```{r }
+library(tidyr)
+LAozone_long <- gather(LAozone,variable,value,vh:doy,factor_key = FALSE)
+LAozone_long[2:4]
+```
+
+#Answer H.1.c
+```{r}
+library(ggplot2)
+ggplot(LAozone_long,aes(x=variable, y=value)) + geom_boxplot() 
+ggplot(LAozone_long,aes(x=value)) + geom_histogram() + facet_wrap(~variable, scales = "free_x")
+```
+
+#Answer H.1.d
+
+```{r}
+LAozone_new <- scale(LAozone,center = TRUE, scale = TRUE)
+LAozone_new <- as.data.frame(LAozone_new)
+LAozone_long <- gather(LAozone_new,variable,value,vh:doy,factor_key = FALSE)
+library(tidyr)
+ggplot(LAozone_long,aes(x=variable, y=value)) + geom_boxplot()
+
+#The predictor variable ibh is the most skewed one as the line that cuts the boxplot (median) divides the box into two unequal parts. The larger part above the meadian means the data is said to be skewed right.
+```
+#Answer H.1.e
+
+```{r}
+library(tidyr)
+ggplot(LAozone_long, aes(x=value, y=ozone)) + geom_point() + facet_wrap(~variable)
+
+#After plotting the graph for predictor vs response we find that all the predictors exhibit linear relationship with the response
+```
+
+#Answer H.1.f
+```{r}
+LAozone$doy <- ifelse(LAozone$doy>90 & LAozone$doy < 274,"April to September","October to March")
+library(tidyr)
+ggplot(LAozone, aes(x=dpg, y=ozone)) + geom_point(aes(shape=doy,color=doy))
+
+#This scatterplot is similar to the scatterplot of dpg vs ozone from e)
+```
+
+

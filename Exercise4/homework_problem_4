@@ -1,0 +1,29 @@
+
+Technichal University of Munich
+Department of Mathematics
+
+MA4401 Applied Regression, Homework problem 4
+
+Prof. Donna Ankerst, Stephan Haug (December 12, 2017)
+
+Problem H.4
+Consider the linear model y=Xβ+εy=Xβ+ε, with XX an n×(p+1)n×(p+1) matrix with rank p+1p+1 and ε∈ℝnε∈Rn a vector of uncorrelated errors with mean 00 and covariance matrix σ2Iσ2I. Further let μˆ=Xβˆμ^=Xβ^ be the fitted values, where βˆβ^ is the vector of least squares estimates, and H=X(X′X)−1X′H=X(X′X)−1X′ denotes the hat matrix.
+
+a) Find the mean vector and covariance matrix of μˆμ^.
+
+b) Show that
+1n∑i=1nVar(μˆi)=σ2p+1n
+1n∑i=1nVar(μ^i)=σ2p+1n
+
+Hint: Find the trace of Cov(μˆ)Cov(μ^) and use the fact that tr(AB)=tr(BA)tr(AB)=tr(BA) for matrices AA and BB, whenever the product is well-defined.
+
+c) Show that HH is a symmetric and idempotent matrix. Further show that the diagonal elements hiihii must lie between zero and one.
+
+Hint: Consider a′iHai′H, where ai∈ℝnai∈Rn is a vector with all components equal to 00 except for the ii-th, which is 11.
+
+d) Assume that the linear model contains a constant term. Show that the diagonal elements hiihii of the hat matrix satisfy hii≥1nhii≥1n.
+
+Hint: Parametrise the model by centering the predictor variables, i.e. consider xij−x⎯⎯⎯jxij−x¯j, j=1,…,pj=1,…,p, as predictor variables instead of xijxij.
+
+e) Read in the weightloss data set available on moodle. The response variable is Loss (weight loss in pounds after 1 month of diet). The predictor variables are Diet (type of diet), and Before (weight in pounds before the diet).
+Use ggplot() for a scatterplot of Loss against Before. Determine the hat matrix for the model Loss ~ Before. Based on the hat matrix, compute the leverage for all data points. Mark the data points with high leverage in a different colour in the scatterplot. Does this approach catch all outliers?

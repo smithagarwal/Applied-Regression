@@ -1,0 +1,81 @@
+---
+title: "AR_ProblemH2_Answer"
+output: html_document
+---
+
+
+
+```{r}
+#Read the LAozone.csv data in a variable LAozone
+
+library(readr)
+LAozone <- read_csv("~/Desktop/TUM Course/Applied Regression/Practical/Data sets-20171021/LAozone.csv",col_names=TRUE)
+```
+
+#Answer H.2.a
+```{r}
+#Calculate the correlation of the predictor with response(ozone)
+cor(LAozone[,2:10],LAozone[,1])
+
+#The above correlation values shows that temp has the highest correlation with ozone (around 0.7807). Therefore we choose temp as the predictor in the first model
+
+#First model fit using lm()
+first_model <- lm(LAozone$ozone~LAozone$temp,data = LAozone)
+first_model
+summary(first_model)
+
+#The estimate b1 for first model = 0.4326. This means that for every 1 unit rise in temperature the ozone value rises by 0.4326
+
+#Second model fit using lm()
+LAozone$season <- factor(LAozone$doy <= 89 | LAozone$doy > 273,
+                         levels = c(TRUE, FALSE), labels = c("winter", "summer"))
+
+second_model <- lm(LAozone$ozone~LAozone$season,data = LAozone)
+second_model
+summary(second_model)
+
+#The estimate b1 for second model = 8.105. This means that when season changes from winter to summer the rise in ozone value is 8.105
+```
+
+#Answer H.2.b
+```{r }
+library(ggfortify)
+
+#Plotting the first model objects for graphical residual analysis
+autoplot(first_model,c(1:2))
+
+#The above plot function displays two graphs - residual vs fitted and Normal QQ plot for the first model.The residual vs fitted graph check for the homogeneity of the variance and the linear relation, if we see no pattern in this graph (ie if this graph looks like stars in the sky), then our assumption that variance should be homogenous across the fitted values of the model for each predictor are met. As we can see from the graph that the variance is homogenously distributed along the fitted values therefore our assumption for this model is met. 
+#The Normal QQ plot check for the normal distribution of the residuals, i.e. the points should fall on a line. If the points fall on a line then we can say that our assumption that residuals should be normally distributed are met. As we can see from the Normal QQ plot of first model that the points fall on a line we say that our assumption for first model is met
+
+#Plotting the second model for graphical residual analysis
+autoplot(second_model,c(1:2))
+
+#The above plot function displays two graphs - residual vs fitted and Normal QQ plot for the second model.The residual vs fitted graph check for the homogeneity of the variance and the linear relation, if we see no pattern in this graph (ie if this graph looks like stars in the sky), then our assumption that variance should be homogenous across the fitted values of the model for each predictor are met. As we can see from the graph that the variance is not homogenously distributed along the fitted values therefore our assumption for the second model is not met. 
+#The Normal QQ plot check for the normal distribution of the residuals, i.e. the points should fall on a line. If the points fall on a line then we can say that our assumption that residuals should be normally distributed are met. As we can see from the Normal QQ plot of second model that the residuals are somewhat falling on the theoretical linear line therefore we say that our assumption for second model is met.
+```
+
+#Answer H.2.c
+```{r}
+#According to the observations from the above plot, I would prefer the first_model for the following reasons:
+#1. We can see from the graph that the variance is homogenously distributed along the fitted values therefore our assumption for the first model is met but the assumption fails for the second model.
+#2. If we check the summary of our first_model and second model we find that the Multiple R-squared value for first model is 0.6095 and for the second model is 0.2566. In theory we know that if the R-squared value is closer to 1 then that model is a good linear regression model. 
+```
+
+#Answer H.2.d
+
+```{r}
+#Function qplot_lm to plot the linear models for comparison
+library(gridExtra)
+library(ggfortify)
+
+qplot_lm <- function(lm_model,cat_pred = F){
+autoplot(lm_model,c(1:2))
+
+}
+
+#Plot for the First model
+qplot_lm(first_model)
+
+#Plot for the second model
+qplot_lm(second_model)
+```

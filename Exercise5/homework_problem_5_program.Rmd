@@ -1,0 +1,95 @@
+---
+title: "AR_ProblemH5_Answer"
+output: html_document
+---
+
+
+
+```{r}
+#Read the coral_reefs.csv data in a variable coral_reefs
+
+library(readr)
+coral_reefs <- read_csv(file.path("~/Desktop","TUM Course","Applied Regression","Homework","coral_reefs.csv"))
+```
+
+#Answer H.5.a
+```{r}
+#Scatterplot of Density against Distance
+library(ggplot2)
+ggplot(coral_reefs,aes(x=Distance,y=Density,col=Reef)) + geom_point() + labs(x="Distance",y="Density")
+```
+
+#Answer H.5.b
+```{r}
+#Fit polynomials data of increasing degree
+library(alr3)
+model1 <- lm(Density ~ poly(Distance,1),coral_reefs)
+pure.error.anova((model1))
+
+model2 <- lm(Density ~ poly(Distance,2),coral_reefs)
+pure.error.anova((model2))
+
+model3 <- lm(Density ~ poly(Distance,3),coral_reefs)
+pure.error.anova((model3))
+
+model4 <- lm(Density ~ poly(Distance,4),coral_reefs)
+pure.error.anova((model4))
+
+model5 <- lm(Density ~ poly(Distance,5),coral_reefs)
+pure.error.anova((model5))
+
+model6 <- lm(Density ~ poly(Distance,6),coral_reefs)
+pure.error.anova((model6))
+
+model7 <- lm(Density ~ poly(Distance,7),coral_reefs)
+pure.error.anova((model7))
+
+#As the p value is above 0.05 for the seventh model, therefore we can't reject the null hypothesis anymore
+
+list_mod <- list(model1,model2,model3,model4,model5,model6,model7)
+```
+
+#Answer H.5.c
+```{r}
+#Perform a residual analysis for the last model
+library(ggfortify)
+autoplot(model7)
+
+#Calculating Cook's Distance
+cooksd <- cooks.distance(model7)
+plot(cooksd, pch="*", cex=2, main="Influential Obs by Cooks distance")  # plot cook's distance
+abline(h = 4*mean(cooksd, na.rm=T), col="red")  # add cutoff line
+text(x=1:length(cooksd)+1, y=cooksd, labels=ifelse(cooksd>4*mean(cooksd, na.rm=T),names(cooksd),""), col="red")  # add labels
+
+#According the Cooks D statistic rownumber 2,26 is an outlier
+
+lambda <- powerTransform(model7,family="bcPower")
+boxCox(model7)
+
+library(lmtest)
+lrtest(model7)
+```
+
+#Answer H.5.d
+```{r}
+#Compute r-squared for all the models
+summary(model1)
+summary(model2)
+summary(model3)
+summary(model4)
+summary(model5)
+summary(model6)
+summary(model7)
+
+AIC(model1)
+AIC(model2)
+AIC(model3)
+AIC(model4)
+AIC(model5)
+AIC(model6)
+AIC(model7)
+
+sapply(list_mod, summary)
+
+sapply(list_mod, AIC)
+```

@@ -1,0 +1,117 @@
+---
+title: "AR_ProblemH3_Answer"
+output: html_document
+---
+
+
+
+```{r}
+#Read the sales.csv data in a variable sales
+
+library(readr)
+sales <- read_csv(file.path("~/Desktop","TUM Course","Applied Regression","Homework","sales.csv"))
+```
+
+#Answer H.3.a
+```{r}
+#Produce a pairs plot of the sales data using GGally::ggpairs()
+library(GGally)
+ggpairs(sales,title="Pairs plot of sales data")
+
+#The above pairs plot shows that there is a strong positive correlation (0.708) between predictor X2 and response Y. The value of Y increases linearly with increase in X2.
+#It also shows that there is a strong negative correlation(-0.798) between predictor X3 and response Y. The value of Y decreases linearly with increase in X3.
+#All the other pairs of plot show little or no dependency among each other based on their correlation values.
+```
+
+#Answer H.3.b
+```{r}
+#Fit a model containing all predictor values, to the data
+
+sales_mod <- lm(Y~X1+X2+X3+X4,data = sales)
+summary(sales_mod)
+
+#Graphical residual analysis by using ggfortify::autoplot
+
+library(ggfortify)
+autoplot(sales_mod)
+
+#After analyzing the graphical residual analysis of the above model we come to a conclusion that there are no strong violations of the model assumptions. The Residuals vs Fitted graph shows a random distribution of residuals against fitted values which satisfies the homogeneity of the variance assumption. Further, the plot shows almost the same variability for growing fitted values, i.e. that assumption of same variance across fitted values seems fulfilled The Normal QQ plot shows that the points follow more or less a straight line, which indicates that the empirical distribution of the residuals is close to normal distribution.
+```
+
+#Answer H.3.c
+```{r}
+#Hypothesis testing
+
+# i) b4=0
+
+#With b4=0 our equation will become y=b0 + b1x1 + b2x2 + b3x3
+sales_mod_i <- lm(Y~X1+X2+X3,data = sales)
+anova(sales_mod_i,sales_mod) #Testing the hypothesis for a restricted model b4=0
+
+#With a p-value of 0.5376 we infer that the null hypothesis is true and we accept the null hypothesis of b4=0 (i.e X4 does not have much effect on the linear regression model. Therefore our reduced model is better than the original model)
+
+# ii) b3=b4=0
+
+#With b3=b4=0 our equation will become y=b0 + b1x1 + b2x2
+sales_mod_ii <- lm(Y~X1+X2,data = sales)
+anova(sales_mod_ii,sales_mod) #Testing the hypothesis for a restricted model b4=0
+
+#With a p-value of 7.524e-12 we infer that the null hypothesis is false and we reject the null hypothesis of b3=b4=0 (i.e X3 has a significant effect on the linear regression model. Therefore our reduced model is not as good as the original model)
+
+# iii) b2=b3
+
+#With b2=b3 our equation will become y=b0 + b1x1 + b2(x2+x3) + b4x4
+sales$X2n3 <- sales$X2+sales$X3
+sales_mod_iii <- lm(Y~X1+X2n3+X4,data = sales)
+anova(sales_mod_iii,sales_mod) #Testing the hypothesis for a restricted model b4=0
+
+#With a p-value of 4.42e-13 we infer that the null hypothesis is false and we reject the null hypothesis of b2=b3 (i.e X2 and X3 is not affecting the linear regression model in the same way. Therefore effect of X2 and X3 are different from each other. Therefore our original model is better than the reduced model)
+
+# iv) b1=b2=b3=b4=0
+
+#With b1=b2=b3=b4=0 our equation will become y=b0
+sales_mod_iv <- lm(Y~1,data=sales)
+anova(sales_mod_iv,sales_mod) #Testing the hypothesis for a restricted model b1=b2=b3=b4=0
+
+#With a p-value of 1.285e-12 we infer that the null hypothesis is false and we reject the null hypothesis of b1=b2=b3=b4=0 (i.e X1,X2,X3 and X4 has a significant effect on the linear regression model)
+```
+
+#Answer H.3.d
+```{r}
+#Write a function test_linht() to compute test statistic and p-value
+
+test_linht <- function(model_red, model_full, df_add = 1, df_full = 10)
+{
+  anova_df <- anova(model_red,model_full)
+  p_val <- anova_df[2,"Pr(>F)"]
+  t_stat <- anova_df[2,"F"]
+  l_mod <- list(t_stat,p_val)
+  names(l_mod) <- c("test_statistic","p_value")
+  return(l_mod)
+}
+
+#Apply your function to the test problem from part c) (ii)
+
+test_linht(sales_mod_ii,sales_mod)
+```
+
+#Answer H.3.e
+```{r}
+#Estimate and interpret the regression coefficients of reduced model b4=0
+
+coef(sales_mod_i) #sales_mod_i is the reduced model for b4=0 as given in part c
+
+#With the above regression coefficients our model becomes y = 178.520620 + 2.105547*X1 + 3.562403*X2 - 22.187992*X3
+#This suggest that for 1000 dollars increase in promotional expenditures (X1) the sales increases by 210554.7 dollars. With increase of active accounts(X2) by 1 unit the sales increases by 356240.3 dollars. With increase in number of competing brands(X3) by 1 the sales will decrease by 2218799.2 dollars. 
+```
+
+#Answer H.3.f
+```{r}
+#Using model in part e
+
+new_df <- data.frame(X1=3,X2=45,X3=10)
+predict.lm(sales_mod_i,new_df,interval = "prediction")
+
+#The prediction of Sales(Y) in 100,000s of dollars where Promotional Expenditures(X1 in thousands of dollars)=3, Active Accounts(X2)=45, and Number of competing brands(X3)=10 is 123.2655.
+#The 95% prediction interval of the sales in 100,000s dollars for X1=3,X2=45 and X3=10 is between 111.4556 and 135.0753. 
+```

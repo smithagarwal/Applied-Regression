@@ -1,0 +1,31 @@
+---
+title: "AR_ProblemH4_Answer"
+output: html_document
+---
+
+
+
+```{r}
+#Read the weightloss.csv data in a variable weightloss
+
+library(readr)
+weightloss <- read_csv(file.path("~/Desktop","TUM Course","Applied Regression","Homework","weightloss.csv"))
+```
+
+#Answer H.4.e
+```{r}
+#Scatterplot of Loss against Before
+library(ggplot2)
+ggplot(weightloss,aes(Before,Loss)) + geom_point() + labs(x="Before",y="After")
+model <- lsfit(weightloss$Before,weightloss$Loss)
+summary(model)
+
+#The diagonal elements of hat matrix are given by:
+
+H <- ls.diag(model)$hat
+h_bar <- mean(H)
+high_leverage <- H>2*h_bar
+ggplot(weightloss,aes(x= Before, y= Loss)) + geom_point(aes(color=high_leverage))
+
+#All outliers are not identified as (275,51) is left out.
+```
